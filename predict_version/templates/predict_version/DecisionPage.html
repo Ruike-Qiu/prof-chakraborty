@@ -1,0 +1,315 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block title %}Make your choice!{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+        var scale;
+        var loca;
+        var data = [];
+        var dataSeries;
+        var dataPoints = [];
+        var tmp_x;
+        var tmp_y;
+        var chart;
+        window.onload = function(){
+        scale = js_vars.scale;
+        loca = js_vars.location;
+        
+        dataSeries = { type: "line", markerType: "circle", markerSize: 0};
+        dataPoints = [];
+        for (var i = 0; i <= 100; i++) {
+            tmp_y = scale * (1 - Math.pow(1 - (i / 100),2)) + loca;
+            tmp_x = scale * (1 - Math.pow(i/100,2));
+            if (i == 50){
+                dataPoints.push({
+                    x: tmp_x,
+                    y: tmp_y,
+                    markerSize: 10,
+                    highlightEnabled: false
+                });
+            }
+            else{
+                dataPoints.push({
+                    x: tmp_x,
+                    y: tmp_y,
+                    markerSize: 0,
+                    highlightEnabled: false
+                });
+            }
+        }
+        dataSeries.dataPoints = dataPoints;
+        data.push(dataSeries);
+        chart = new CanvasJS.Chart("chartContainer", {
+            data: data,
+            axisX: {
+                maximum: 21000
+            },
+            axisY: {
+                maximum: 23000,
+                minimum: 0,
+                interval: 10000
+            }
+            });
+        chart.render();
+}
+        
+        
+            
+</script>
+<style>
+    input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
+    width: 8px;
+    height: 255px;
+    padding: 0 5px;
+}
+    table, tr, td
+    {
+    border: 1px solid black;
+    }
+    td{
+    width: 50px;
+    text-align: center;
+    }
+    th{
+    border: none;
+    }
+    table
+    {
+        margin: auto;
+        table-layout: fixed;
+    }
+    main
+    {
+    display: flex;
+    flex-direction: column;
+    }
+    #flexbody{
+    display: flex;
+    flex-direction: row;
+    }
+    #intro{
+    margin-top: auto;
+    margin-bottom: auto;
+    }
+    #yaxis{
+    margin-top: auto;
+    margin-bottom: auto;
+    }
+    #ranger{
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    padding-right: 200px;
+    }
+    #checker{
+    margin:auto;
+    }
+    #checkcontainer{
+    width: 60px;
+    text-align: center;
+    padding-top: 122px;
+    }
+    #yaxiscontainer{
+    width: 60px;
+    text-align: center;
+    padding-top: 122px;
+    }
+    .choose{
+    cursor: pointer;
+    padding-left: 65px;
+    }
+    #choosea{
+    padding-top: 50px;
+    padding-left: 65px;
+    cursor: pointer;
+    }
+    #canvas{
+    padding-left: 120px;
+    }
+    #topflex{
+    display: flex;
+    flex-direction: row;
+    }
+    #bottomflex{
+    display: flex;
+    flex-direction: row;
+    }
+    #y{
+    padding-left: 150px;
+    padding-top: 50px;
+    }
+    #x{
+    padding-left: 500px;
+    }
+    #indicator{
+    padding-left: 350px;
+    padding-bottom: 200px;
+    }
+    #indicatorf{
+    padding-left: 350px;
+    }
+</style>
+
+<table id="payoff">
+    {%for row in mat%}
+    <tr>
+        {%for cell in row%}
+        <td>
+            {{cell}}
+        </td>
+        {% endfor %}
+    </tr>
+        {% endfor %}
+</table>
+<div id="topflex">
+    <p id="choosea" onclick="more()">More likely </p>
+    <p id="y">Points if E occurs</p>
+</div>
+<div id="flexbody">
+    <p id="intro"> Likelihood of E </p>
+    <div id="ranger">
+        <input type="range" orient="vertical" id="slide" max="1" min = "0" step = "0.01" name = "Guess" oninput="change()"/>
+    </div>
+    <div style = "height:280px; width:400px;" id="chartContainer"> </div>
+</div>
+<div id="bottomflex">
+    <p class="choose" onclick="less()">Less likely  </p>
+    <p id="x">Points if F occurs</p>
+</div>
+<div>
+    <p id="indicatorf" style="font-weight: bold;">Points if E occurs: 18500</p>
+    <p id="indicator" style="font-weight: bold;">Points if F occurs: 7500</p>
+</div>
+<script>
+    var payoff = document.getElementById("payoff");
+    var rowlen = payoff.rows.length;
+    var collen = payoff.rows[0].cells.length;
+    var shade = js_vars.shaded
+    for (var i=0; i < shade.length;i++){
+        var row = parseInt((shade[i] - 1) /collen);
+        var col = (shade[i] - 1) % collen;
+        payoff.rows[row].cells[col].style.backgroundColor = "pink";
+    }
+    if (collen == 2){
+        var hcol = payoff.insertRow(0);
+        var hcolcell1 = hcol.insertCell(0);
+        var hcolcell2 = hcol.insertCell(1);
+        hcol.style.border = "none";
+        hcolcell1.style.border = "none";
+        hcolcell2.style.border = "none";
+        hcolcell1.innerHTML = "L";
+        hcolcell2.innerHTML = "R";
+    } else{
+        var hcol = payoff.insertRow(0);
+        var hcolcell1 = hcol.insertCell(0);
+        var hcolcell2 = hcol.insertCell(1);
+        var hcolcell3 = hcol.insertCell(2);
+        hcol.style.border = "none";
+        hcolcell1.style.border = "none";
+        hcolcell2.style.border = "none";
+        hcolcell3.style.border = "none";
+        hcolcell1.innerHTML = "L";
+        hcolcell2.innerHTML = "C";
+        hcolcell3.innerHTML = "R";
+    }
+    payoff.style.borderTop = "none";
+    payoff.style.borderLeft = "none";
+    payoff.style.borderRight = "none";
+    payoff.style.borderBottom = "none";
+    if (rowlen == 2){
+        var row0 = payoff.rows[0];
+        var row1 = payoff.rows[1];
+        var row2 = payoff.rows[2];
+        var col0 = row0.insertCell(0);
+        var col1 = row1.insertCell(0);
+        var col2 = row2.insertCell(0);
+        col0.style.border = "none";
+        col1.style.border = "none";
+        col2.style.border = "none";
+        row1.style.border = "none";
+        row2.style.border = "none";
+        col1.innerHTML = "T";
+        col2.innerHTML = "B";
+    } else{
+        var row0 = payoff.rows[0];
+        var row1 = payoff.rows[1];
+        var row2 = payoff.rows[2];
+        var row3 = payoff.rows[3];
+        var col0 = row0.insertCell(0);
+        var col1 = row1.insertCell(0);
+        var col2 = row2.insertCell(0);
+        var col3 = row3.insertCell(0);
+        col0.style.border = "none";
+        col1.style.border = "none";
+        col2.style.border = "none";
+        col3.style.border = "none";
+        row1.style.border = "none";
+        row2.style.border = "none";
+        row3.style.border = "none";
+        col1.innerHTML = "T";
+        col2.innerHTML = "M";
+        col3.innerHTML = "B";
+    }
+</script>
+<script>
+    var highlight = 50;
+    function more(){
+        if (highlight < 100){
+        var comp = Math.floor(document.getElementById("slide").value * 100) + 0.5;
+        if(document.getElementById("slide").value * 100 >= comp){
+            document.getElementById("slide").value = (Math.ceil(document.getElementById("slide").value * 100) + 1) / 100;
+        } else{
+            document.getElementById("slide").value = (Math.floor(document.getElementById("slide").value * 100) + 1) / 100;
+        }
+        chart.options.data[0].dataPoints[highlight].markerSize = 0;
+        highlight = highlight + 1;
+        chart.options.data[0].dataPoints[highlight].markerSize = 10;
+        chart.render();
+        }
+        var t_x = chart.options.data[0].dataPoints[highlight].x.toFixed();
+            var new_indi = "Points if F occurs: " + t_x;
+            var new_indif = "Points if E occurs: " + chart.options.data[0].dataPoints[highlight].y.toFixed();
+            document.getElementById("indicator").textContent = new_indi;
+            document.getElementById("indicatorf").textContent = new_indif;
+    }
+    function less(){
+        if (highlight > 0){
+        document.getElementById("slide").value = document.getElementById("slide").value - 0.01;
+        chart.options.data[0].dataPoints[highlight].markerSize = 0;
+        highlight = highlight - 1;
+        chart.options.data[0].dataPoints[highlight].markerSize = 10;
+        chart.render();
+        }
+        var t_x = chart.options.data[0].dataPoints[highlight].x.toFixed();
+            var new_indi = "Points if F occurs: " + t_x;
+            var new_indif = "Points if E occurs: " + chart.options.data[0].dataPoints[highlight].y.toFixed();
+            document.getElementById("indicator").textContent = new_indi;
+            document.getElementById("indicatorf").textContent = new_indif;
+    }
+    function change(){
+        chart.options.data[0].dataPoints[highlight].markerSize = 0;
+        highlight = Math.floor(document.getElementById("slide").value * 100);
+        chart.options.data[0].dataPoints[highlight].markerSize = 10;
+        chart.render();
+        var t_x = chart.options.data[0].dataPoints[highlight].x.toFixed();
+            var new_indi = "Points if F occurs: " + t_x;
+            var new_indif = "Points if E occurs: " + chart.options.data[0].dataPoints[highlight].y.toFixed();
+            document.getElementById("indicator").textContent = new_indi;
+            document.getElementById("indicatorf").textContent = new_indif;
+    }
+</script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+
+{% next_button %}
+
+
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block title %}Result{% endblock %}
+
+{% block content %}
+
+<p id="showresult">
+</p>
+<script>
+    p_loc = document.getElementById("showresult");
+    p_loc.textContent = "As a result, we randomly chose the round: " + js_vars.r_num + ", the thing you are trying to predict is the probability of event" + js_vars.gus_res + ", and your guess probability is " + js_vars.prob + ", the event that happens in round" + js_vars.r_num + " is event " + js_vars.happen_res + ", so as a result, you will gain " + js_vars.pay + " points."
+</script>
+
+{% next_button %}
+
+{% endblock %}
